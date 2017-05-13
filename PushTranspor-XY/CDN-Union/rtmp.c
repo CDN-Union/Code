@@ -3448,13 +3448,28 @@ int PILI_RTMP_SendChunk(PILI_RTMP *r, PILI_RTMPChunk *chunk, RTMPError *error) {
 }
 
 int PILI_RTMP_SendPacket(PILI_RTMP *r, PILI_RTMPPacket *packet, int queue, RTMPError *error) {
+    static i = 0;
     int ret;
-    if(r->push_module != NULL) {
-        ret = r->push_module->push_message_packet(r, packet, queue, error);
-    }
-    else{
+    int tag_size = 1 + 3 + 3 + 1 + 3 + packet->m_nBodySize;
+
+    if(r->push_module == NULL || strncmp(r->push_module->module_name, "RTMPPushModule", strlen("RTMPPushModule")) == 0) {
         ret = PILI_RTMP_SendPacket_Module(r, packet, queue, error);
+    } else {
+        char *flv_tag = malloc(tag_size);
+        if(flv_tag == NULL) {
+            PILI_RTMP_Log(PILI_RTMP_LOGERROR, "malloc error");
+            return FALSE;
+        }
+        memset(flv_tag, 0, tag_size);
+
+        PILI_RTMP_Log(PILI_RTMP_LOGERROR, "malloc1 %p, tag_size: %d", flv_tag, tag_size);
+        ret = rtmp_packet_to_flv(packet, flv_tag, tag_size);
+        r->push_module->push_message_push(r, flv_tag, tag_size, error);
+        free(flv_tag);
+        flv_tag = NULL;
+
     }
+
     return ret;
     
 }
@@ -4450,8 +4465,8 @@ static const PILI_AVal av_setDataFrame = AVC("@setDataFrame");
 
 int PILI_RTMP_Write(PILI_RTMP *r, const char *buf, int size, RTMPError *error) {
     int ret = 0;
-    if(r->push_module->push_message_write != NULL) {
-        ret = r->push_module->push_message_write(r, (void*)buf, size, error);
+    if(r->push_module->push_message_push != NULL) {
+        ret = r->push_module->push_message_push(r, (void*)buf, size, error);
     }
     return ret;
 }

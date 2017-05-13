@@ -12,15 +12,12 @@
 #include <stdio.h>
 #include "amf.h"
 #include "log.h"
-
+#include "rtmp.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
     
-    //(PILI_RTMP*, RTMP_Error*)
-    //(PILI_RTMP*)
-    //(PILI_RTMP*, PILI_RTMPPacket,
-    //(PILI_RTMP*, const char *, int,
+
     /* 模块定义 */
     typedef struct panda_push_module_s {
         
@@ -32,14 +29,13 @@ extern "C" {
         int (*release)(void*);
        
         /* PILI_RTMP*, const char*, int, RTMP_Error* */
-        int (*push_message_write)(void *rtmp, void *buf, uint32_t size, void *err);
-        
-        /*PILI_RTMP*, PILI_RTMPPacket, RTMP_Error* */
-        int (*push_message_packet)(void *rtmp, void* packet, int queue, void *err);
+        int (*push_message_push)(void *rtmp, void *buf, uint32_t size, void *err);
         
     }panda_push_module_t;
     
-    
+    int
+    rtmp_packet_to_flv(struct PILI_RTMPPacket *packet, char *flv_tag, int flv_tag_size);
+
     int expore_all_module(char *negotiate);
     panda_push_module_t *select_module(PILI_AVal *negotiate);
     

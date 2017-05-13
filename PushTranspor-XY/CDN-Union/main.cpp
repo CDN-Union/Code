@@ -123,7 +123,7 @@ int publish_using_packet(){
     PILI_RTMP_Init(rtmp);
     //set connection timeout,default 30s
     rtmp->Link.timeout=5;
-    RTMPError* err;
+    RTMPError* err = NULL;
     if(!PILI_RTMP_SetupURL(rtmp,"rtmp://live.test.com/live/stream1", err))
     {
         PILI_RTMP_Log(PILI_RTMP_LOGERROR,"SetupURL Err\n");
@@ -151,7 +151,7 @@ int publish_using_packet(){
     }
     
     packet=(PILI_RTMPPacket*)malloc(sizeof(PILI_RTMPPacket));
-    PILI_RTMPPacket_Alloc(packet,1024*64);
+    PILI_RTMPPacket_Alloc(packet,1024*256);
     PILI_RTMPPacket_Reset(packet);
     
     packet->m_hasAbsTimestamp = 0;

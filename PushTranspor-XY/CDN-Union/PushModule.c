@@ -39,6 +39,22 @@ expore_all_module(char *negotiate)
     
 }
 
+
+int
+rtmp_packet_to_flv(PILI_RTMPPacket *packet, char *flv_tag, int tag_size)
+{
+    if(tag_size != (1+3+4+packet->m_nBodySize)) {
+        return -1;
+    }
+    memcpy(flv_tag, packet->m_packetType, sizeof(packet->m_packetType)); /*type*/
+    memcpy(flv_tag, packet->m_nBodySize, 3); /*datalen*/
+    memcpy(flv_tag, packet->m_nTimeStamp, 4); /*timestamp3 + extra1*/
+    memcpy(flv_tag, 0, 3); /*stream id  always 0*/
+    memcpy(flv_tag, packet->m_body, packet->m_nBodySize); /*body*/
+
+    return 0;
+}
+
 /* 根据服务器返回选择传输模块 */
 panda_push_module_t *
 select_module(PILI_AVal *negotiate)
@@ -60,7 +76,7 @@ select_module(PILI_AVal *negotiate)
 /* 定义星域推流模块 */
 static int xypush_module_init(void *arg, void *err);
 static int xypush_module_release(void *arg);
-static int xypush_module_push_write(void*, void*, uint32_t, void*);
+static int xypush_module_push(void*, void*, uint32_t, void*);
 
 //static struct XYPushSession *s = NULL;
 
@@ -69,8 +85,7 @@ panda_push_module_t xypush_module =
     "XYPushModule",
     xypush_module_init,
     xypush_module_release,
-    xypush_module_push_write,
-    NULL
+    xypush_module_push
 };
 
 
@@ -84,7 +99,7 @@ int xypush_module_release(void *arg)
     return 0;
 }
 
-int xypush_module_push_write(void *rtmp, void *buf, uint32_t size, void *err)
+int xypush_module_push(void *rtmp, void *buf, uint32_t size, void *err)
 {
     return TRUE;
 }
@@ -93,16 +108,14 @@ int xypush_module_push_write(void *rtmp, void *buf, uint32_t size, void *err)
 /* 定义rtmp默认推流模块 */
 static int rtmp_module_init(void *arg, void *err);
 static int rtmp_module_release(void *arg);
-static int rtmp_module_push_packet(void*, void*, int, void*);
-static int rtmp_module_push_write(void*, void*, uint32_t, void*);
+static int rtmp_module_push(void*, void*, uint32_t, void*);
 
 panda_push_module_t rtmppush_module =
 {
     "RTMPPushModule",
     rtmp_module_init,
     rtmp_module_release,
-    rtmp_module_push_write,
-    rtmp_module_push_packet
+    rtmp_module_push
 };
 
 
@@ -116,18 +129,10 @@ int rtmp_module_release(void *arg)
     return 0;
 }
 
-int rtmp_module_push_packet(void *rtmp, void *packet, int queue, void *err)
-{
-    int ret;
-    ret = PILI_RTMP_SendPacket_Module(rtmp, packet, queue, err);
-//    ret = RTMP_SendPacketCall((RTMP*)rtmp, (RTMPPacket*)packet, 0);
-    return  ret;
-}
 
-int rtmp_module_push_write(void* rtmp, void* buf, uint32_t size, void* err)
+int rtmp_module_push(void* rtmp, void* buf, uint32_t size, void* err)
 {
     return PILI_RTMP_Write_Module(rtmp, buf, size, err);
-    return 0;
 }
 
 

@@ -219,7 +219,7 @@ typedef struct PILI_CONNECTION_TIME {
 
 typedef void (*PILI_RTMP_ConnectionTimeCallback)(
     PILI_CONNECTION_TIME *conn_time, void *userData);
-
+struct panda_push_module_s;
 typedef struct PILI_RTMP {
     int m_inChunkSize;
     int m_outChunkSize;
@@ -257,7 +257,7 @@ typedef struct PILI_RTMP {
     int m_polling;
     int m_resplen;
     int m_unackd;
-    panda_push_module_t *push_module;
+    struct panda_push_module_s *push_module;
     PILI_AVal m_clientID;
 
     PILI_RTMP_READ m_read;
