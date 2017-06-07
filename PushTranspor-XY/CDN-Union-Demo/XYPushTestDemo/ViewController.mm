@@ -1,0 +1,545 @@
+//
+//  ViewController.m
+//  XYPushTestDemo
+//
+//  Created by hongduoxing on 16/12/1.
+//  Copyright © 2016年 hongduoxing. All rights reserved.
+//
+
+#import "ViewController.h"
+#include "rtmp_sys.h"
+#include "rtmp.h"
+#include "log.h"
+#include <sys/time.h>
+
+
+static volatile int pushStopFlag = 1;
+static int fileIndex = 0;
+
+
+@interface ViewController ()
+
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    _pickView.dataSource = self;
+    _pickView.delegate = self;
+    
+    // Do any additional setup after loading the view, typically from a nib.
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (IBAction)pushBtn:(id)sender
+{
+    UIButton *btn = sender;
+    
+    if(btn.tag == 0) {
+        //开始推流
+        [btn setTitle:@"结束推流" forState:UIControlStateNormal];
+        
+        [self performSelectorInBackground:@selector(startPacketPush) withObject:nil];
+        
+    } else {
+        //结束推流
+        [btn setTitle:@"开始推流" forState:UIControlStateNormal];
+    }
+    
+    btn.tag ^= 1;
+    pushStopFlag ^= 1;
+}
+
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView*)pickerView
+{
+    return 1;
+}
+
+- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
+{
+    return 2;
+}
+
+- (NSString *)pickerView:(UIPickerView *)pickerView
+             titleForRow:(NSInteger)row forComponent:(NSInteger)component
+{
+    NSString *t[] ={ @"push 800kbps", @"push 1mbps" };
+    return t[row];
+}
+
+- (void)pickerView:(UIPickerView *)pickerView didSelectRow:
+(NSInteger)row inComponent:(NSInteger)component
+{
+    NSString *t[] ={ @"push 800kbps", @"push 1mbps" };
+
+    UIAlertView* alert = [[UIAlertView alloc]
+                          initWithTitle:@"提示"
+                          message:[NSString stringWithFormat:@"select %@", t[row]]
+                          delegate:nil
+                          cancelButtonTitle:@"确定"
+                          otherButtonTitles:nil];
+    [alert show];
+    fileIndex = row;
+}
+
+
+- (NSString*)getFlvFilePath:(int)index
+{
+    NSString *str = [[NSBundle mainBundle] pathForResource:(index == 0 ? @"flv/800" : @"flv/1Mb") ofType:@"flv"];
+    
+    return str;
+}
+
+clock_t clock_ms()
+{
+    struct timeval z;
+    static clock_t ts;
+    
+    gettimeofday(&z, NULL);
+    
+    if(0 == ts) {
+        ts = z.tv_sec * 1000 + z.tv_usec / 1000;
+    }
+    
+    return (z.tv_sec * 1000 + z.tv_usec / 1000 - ts);
+}
+
+int change_bitrate_callBack(void *u, int bitrate)
+{
+    printf("suggest bitrate %d kbps.\n", bitrate);
+    return 0;
+}
+
+
+#define HTON16(x)  ((x>>8&0xff)|(x<<8&0xff00))
+#define HTON24(x)  ((x>>16&0xff)|(x<<16&0xff0000)|(x&0xff00))
+#define HTON32(x)  ((x>>24&0xff)|(x>>8&0xff00)|\
+(x<<8&0xff0000)|(x<<24&0xff000000))
+#define HTONTIME(x) ((x>>16&0xff)|(x<<16&0xff0000)|(x&0xff00)|(x&0xff000000))
+
+
+/*read 1 byte*/
+int ReadU8(uint32_t *u8,FILE*fp){
+    if(fread(u8,1,1,fp)!=1)
+        return 0;
+    return 1;
+}
+
+/*read 2 byte*/
+int ReadU16(uint32_t *u16,FILE*fp){
+    if(fread(u16,2,1,fp)!=1)
+        return 0;
+    *u16=HTON16(*u16);
+    return 1;
+}
+
+/*read 3 byte*/
+int ReadU24(uint32_t *u24,FILE*fp){
+    if(fread(u24,3,1,fp)!=1)
+        return 0;
+    *u24=HTON24(*u24);
+    return 1;
+}
+
+/*read 4 byte*/
+int ReadU32(uint32_t *u32,FILE*fp){
+    if(fread(u32,4,1,fp)!=1)
+        return 0;
+    *u32=HTON32(*u32);
+    return 1;
+}
+
+/*read 1 byte,and loopback 1 byte at once*/
+int PeekU8(uint32_t *u8,FILE*fp){
+    if(fread(u8,1,1,fp)!=1)
+        return 0;
+    fseek(fp,-1,SEEK_CUR);
+    return 1;
+}
+
+/*read 4 byte and convert to time format*/
+int ReadTime(uint32_t *utime,FILE*fp){
+    if(fread(utime,4,1,fp)!=1)
+        return 0;
+    *utime=HTONTIME(*utime);
+    return 1;
+}
+
+int InitSockets()
+{
+#ifdef WIN32
+    WORD version;
+    WSADATA wsaData;
+    version=MAKEWORD(2,2);
+    return (WSAStartup(version, &wsaData) == 0);
+#endif
+    return TRUE;
+}
+
+void CleanupSockets()
+{
+#ifdef WIN32
+    WSACleanup();
+#endif
+}
+
+- (int)startWritePush
+{
+    NSString *textUrl = _textField.text;
+    const char *ksUrl = [textUrl cStringUsingEncoding:NSASCIIStringEncoding];
+    
+    NSString *nsFilePath;
+    const char *filePath;
+    
+    
+    uint32_t start_time=0;
+    uint32_t now_time=0;
+    uint32_t pre_frame_time=0;
+    uint32_t lasttime=0;
+    int bNextIsKey=0;
+    char* pFileBuf=NULL;
+    
+    //read from tag header
+    uint32_t type=0;
+    uint32_t datalength=0;
+    uint32_t timestamp=0;
+    
+    PILI_RTMP *rtmp = NULL;
+    RTMPError *err;
+    FILE*fp=NULL;
+    
+    
+    nsFilePath = [self getFlvFilePath:fileIndex];
+    filePath = [nsFilePath cStringUsingEncoding:NSASCIIStringEncoding];
+    
+    fp=fopen(filePath,"rb");
+    if (!fp){
+        PILI_RTMP_LogPrintf("Open File Error.\n");
+        CleanupSockets();
+        return -1;
+    }
+    
+    /* set log level */
+    //PILI_RTMP_LogLevel loglvl=PILI_RTMP_LOGDEBUG;
+    //PILI_RTMP_LogSetLevel(loglvl);
+    
+    if (!InitSockets()){
+        PILI_RTMP_LogPrintf("Init Socket Err\n");
+        return -1;
+    }
+    
+    rtmp=PILI_RTMP_Alloc();
+    PILI_RTMP_Init(rtmp);
+    //set connection timeout,default 30s
+    rtmp->Link.timeout=5;
+    if(!PILI_RTMP_SetupURL(rtmp, ksUrl, err))
+    {
+        PILI_RTMP_Log(PILI_RTMP_LOGERROR,"SetupURL Err\n");
+        PILI_RTMP_Free(rtmp);
+        CleanupSockets();
+        return -1;
+    }
+    
+    PILI_RTMP_EnableWrite(rtmp);
+    //1hour
+    PILI_RTMP_SetBufferMS(rtmp, 3600*1000);
+    if (!PILI_RTMP_Connect(rtmp,NULL, err)){
+        PILI_RTMP_Log(PILI_RTMP_LOGERROR,"Connect Err\n");
+        PILI_RTMP_Free(rtmp);
+        CleanupSockets();
+        return -1;
+    }
+    
+    if (!PILI_RTMP_ConnectStream(rtmp,0,err)){
+        PILI_RTMP_Log(PILI_RTMP_LOGERROR,"ConnectStream Err\n");
+        PILI_RTMP_Close(rtmp,err);
+        PILI_RTMP_Free(rtmp);
+        CleanupSockets();
+        return -1;
+    }
+    
+    printf("Start to send data ...\n");
+    
+    //jump over FLV Header
+    fseek(fp,9,SEEK_SET);
+    //jump over previousTagSizen
+    fseek(fp,4,SEEK_CUR);
+    start_time=PILI_RTMP_GetTime();
+    while(1)
+    {
+        if((((now_time=PILI_RTMP_GetTime())-start_time)
+            <(pre_frame_time))){
+            //wait for 1 sec if the send process is too fast
+            //this mechanism is not very good,need some improvement
+            if(pre_frame_time>lasttime){
+                //PILI_RTMP_LogPrintf("TimeStamp:%8lu ms\n",pre_frame_time);
+                lasttime=pre_frame_time;
+            }
+            usleep(50);
+            continue;
+        }
+        
+        
+        //jump over type
+        fseek(fp,1,SEEK_CUR);
+        if(!ReadU24(&datalength,fp))
+            break;
+        if(!ReadTime(&timestamp,fp))
+            break;
+        //jump back
+        fseek(fp,-8,SEEK_CUR);
+        
+        pFileBuf=(char*)malloc(11+datalength+4);
+        memset(pFileBuf,0,11+datalength+4);
+        if(fread(pFileBuf,1,11+datalength+4,fp)!=(11+datalength+4))
+            break;
+        
+        pre_frame_time=timestamp;
+        
+        if (!PILI_RTMP_IsConnected(rtmp)){
+            PILI_RTMP_Log(PILI_RTMP_LOGERROR,"rtmp is not connect\n");
+            break;
+        }
+        if (!PILI_RTMP_Write(rtmp,pFileBuf,11+datalength+4, err)){
+            PILI_RTMP_Log(PILI_RTMP_LOGERROR,"Rtmp Write Error\n");
+            break;
+        }
+        
+        free(pFileBuf);
+        pFileBuf=NULL;
+        
+        if(!PeekU8(&type,fp))
+            break;
+        if(type==0x09){
+            if(fseek(fp,11,SEEK_CUR)!=0)
+                break;
+            if(!PeekU8(&type,fp)){
+                break;
+            }
+            if(type==0x17)
+                bNextIsKey=1;
+            else
+                bNextIsKey=0;
+            fseek(fp,-11,SEEK_CUR);
+        }
+        
+        if(pushStopFlag) {
+            break;
+        }
+    }
+    
+    PILI_RTMP_LogPrintf("\nSend Data Over\n");
+    
+    if(fp)
+        fclose(fp);
+    
+    if (rtmp!=NULL){
+        PILI_RTMP_Close(rtmp, err);
+        PILI_RTMP_Free(rtmp);
+        rtmp=NULL;
+    }
+    
+    if(pFileBuf){
+        free(pFileBuf);
+        pFileBuf=NULL;
+    }
+    
+    CleanupSockets();
+    
+    return 0;
+}
+
+- (int)startPacketPush
+{
+    NSString *textUrl = _textField.text;
+    const char *ksUrl = [textUrl cStringUsingEncoding:NSASCIIStringEncoding];
+    
+    NSString *nsFilePath;
+    const char *filePath;
+    
+    PILI_RTMP *rtmp=NULL;
+    PILI_RTMPPacket *packet=NULL;
+    uint32_t start_time=0;
+    uint32_t now_time=0;
+    //the timestamp of the previous frame
+    long pre_frame_time=0;
+    long lasttime=0;
+    int bNextIsKey=1;
+    uint32_t preTagsize=0;
+    
+    //packet attributes
+    uint32_t type=0;
+    uint32_t datalength=0;
+    uint32_t timestamp=0;
+    uint32_t streamid=0;
+    FILE*fp=NULL;
+
+    
+    nsFilePath = [self getFlvFilePath:fileIndex];
+    filePath = [nsFilePath cStringUsingEncoding:NSASCIIStringEncoding];
+    
+    fp=fopen(filePath, "rb");
+    if (!fp){
+        PILI_RTMP_LogPrintf("Open File Error.\n");
+        CleanupSockets();
+        return -1;
+    }
+    
+    /* set log level */
+    PILI_RTMP_LogLevel loglvl = PILI_RTMP_LOGERROR;
+    PILI_RTMP_LogSetLevel(loglvl);
+    
+    if (!InitSockets()){
+        PILI_RTMP_LogPrintf("Init Socket Err\n");
+        return -1;
+    }
+    
+    rtmp=PILI_RTMP_Alloc();
+    PILI_RTMP_Init(rtmp);
+    //set connection timeout,default 30s
+    rtmp->Link.timeout=5;
+    RTMPError* err = NULL;
+    if(!PILI_RTMP_SetupURL(rtmp, ksUrl, err))
+    {
+        PILI_RTMP_Log(PILI_RTMP_LOGERROR,"SetupURL Err\n");
+        PILI_RTMP_Free(rtmp);
+        CleanupSockets();
+        return -1;
+    }
+    
+    //if unable,the AMF command would be 'play' instead of 'publish'
+    PILI_RTMP_EnableWrite(rtmp);
+    
+    if (!PILI_RTMP_Connect(rtmp,NULL, err)){
+        PILI_RTMP_Log(PILI_RTMP_LOGERROR,"Connect Err\n");
+        PILI_RTMP_Free(rtmp);
+        CleanupSockets();
+        return -1;
+    }
+    
+    if (!PILI_RTMP_ConnectStream(rtmp,0,err)){
+        PILI_RTMP_Log(PILI_RTMP_LOGERROR,"ConnectStream Err\n");
+        PILI_RTMP_Close(rtmp,err);
+        PILI_RTMP_Free(rtmp);
+        CleanupSockets();
+        return -1;
+    }
+    
+    packet=(PILI_RTMPPacket*)malloc(sizeof(PILI_RTMPPacket));
+    PILI_RTMPPacket_Alloc(packet,1024*512);
+    PILI_RTMPPacket_Reset(packet);
+    
+    packet->m_hasAbsTimestamp = 0;
+    packet->m_nChannel = 0x04;
+    packet->m_nInfoField2 = rtmp->m_stream_id;
+    
+    PILI_RTMP_LogPrintf("Start to send data ...\n");
+    
+    //jump over FLV Header
+    fseek(fp,9,SEEK_SET);
+    //jump over previousTagSizen
+    fseek(fp,4,SEEK_CUR);
+    start_time=PILI_RTMP_GetTime();
+    while(1)
+    {
+        if((((now_time=PILI_RTMP_GetTime())-start_time)
+            <(pre_frame_time))){
+            //wait for 1 sec if the send process is too fast
+            //this mechanism is not very good,need some improvement
+            if(pre_frame_time>lasttime){
+//                PILI_RTMP_LogPrintf("TimeStamp:%8lu ms\n",pre_frame_time);
+                lasttime=pre_frame_time;
+            }
+            usleep(500);
+            continue;
+        }
+        
+        //not quite the same as FLV spec
+        if(!ReadU8(&type,fp))
+            break;
+        if(!ReadU24(&datalength,fp))
+            break;
+        if(!ReadTime(&timestamp,fp))
+            break;
+        if(!ReadU24(&streamid,fp))
+            break;
+        
+        if (type!=0x08&&type!=0x09){
+            //jump over non_audio and non_video frame，
+            //jump over next previousTagSizen at the same time
+            fseek(fp,datalength+4,SEEK_CUR);
+            continue;
+        }
+        
+        if(fread(packet->m_body,1,datalength,fp)!=datalength)
+            break;
+        
+        packet->m_headerType = RTMP_PACKET_SIZE_LARGE;
+        packet->m_nTimeStamp = timestamp;
+        packet->m_packetType = type;
+        packet->m_nBodySize  = datalength;
+        pre_frame_time=timestamp;
+        
+        //        PILI_RTMP_Log(PILI_RTMP_LOGERROR,"Timestamp: %8lu ms, Pre_frame_time: %8lu ms\n", timestamp, pre_frame_time);
+        
+        
+        if (!PILI_RTMP_IsConnected(rtmp)){
+            PILI_RTMP_Log(PILI_RTMP_LOGERROR,"rtmp is not connect\n");
+            break;
+        }
+        if (!PILI_RTMP_SendPacket(rtmp,packet,0,err)){
+            PILI_RTMP_Log(PILI_RTMP_LOGERROR,"Send Error\n");
+            break;
+        }
+        
+        if(!ReadU32(&preTagsize,fp))
+            break;
+        
+        if(!PeekU8(&type,fp))
+            break;
+        if(type==0x09){
+            if(fseek(fp,11,SEEK_CUR)!=0)
+                break;
+            if(!PeekU8(&type,fp)){
+                break;
+            }
+            if(type==0x17)
+                bNextIsKey=0;
+            else
+                bNextIsKey=1;
+            
+            fseek(fp,-11,SEEK_CUR);
+        }
+        
+        if(pushStopFlag) {
+            break;
+        }
+    }
+    
+    PILI_RTMP_LogPrintf("\nSend Data Over\n");
+    
+    if(fp)
+        fclose(fp);
+    
+    if (rtmp!=NULL){
+        PILI_RTMP_Close(rtmp,err);
+        PILI_RTMP_Free(rtmp);
+        rtmp=NULL;
+    }
+    if (packet!=NULL){
+        PILI_RTMPPacket_Free(packet);
+        free(packet);
+        packet=NULL;
+    }
+    
+    CleanupSockets();
+    return 0;
+}
+
+@end
