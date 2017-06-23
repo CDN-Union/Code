@@ -1,0 +1,6 @@
+framework module Pods_flvpusher {
+  umbrella header "Pods-flvpusher-umbrella.h"
+
+  export *
+  module * { export * }
+}

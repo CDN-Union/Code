@@ -1,0 +1,550 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1838B0301EFBC0D600B3D53E /* libWSLibrtmpUnion.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1838B0281EFBC0D600B3D53E /* libWSLibrtmpUnion.a */; };
+		810D7FBC1E529D1200393AF9 /* ws_cut.flv in Resources */ = {isa = PBXBuildFile; fileRef = 810D7FBA1E529D1200393AF9 /* ws_cut.flv */; };
+		810D7FBD1E529D1200393AF9 /* ws_cut2.flv in Resources */ = {isa = PBXBuildFile; fileRef = 810D7FBB1E529D1200393AF9 /* ws_cut2.flv */; };
+		810D7FDC1E5306AA00393AF9 /* flv_pusher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 810D7FC41E5306AA00393AF9 /* flv_pusher.cpp */; };
+		810D7FDD1E5306AA00393AF9 /* FlvParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 810D7FC61E5306AA00393AF9 /* FlvParser.cpp */; };
+		810D7FED1E5402AD00393AF9 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 810D7FEC1E5402AD00393AF9 /* Alamofire.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+		814569AC1E5A8D0B0006D35F /* liblibevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 814569AB1E5A8D020006D35F /* liblibevent.a */; };
+		819249EF1E4EF892003B1FE9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819249EE1E4EF892003B1FE9 /* AppDelegate.swift */; };
+		819249F11E4EF892003B1FE9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819249F01E4EF892003B1FE9 /* ViewController.swift */; };
+		819249F41E4EF892003B1FE9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 819249F21E4EF892003B1FE9 /* Main.storyboard */; };
+		819249F61E4EF892003B1FE9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 819249F51E4EF892003B1FE9 /* Assets.xcassets */; };
+		819249F91E4EF892003B1FE9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 819249F71E4EF892003B1FE9 /* LaunchScreen.storyboard */; };
+		B706C5F5434C6C0ADB7E5BD4 /* Pods_flvpusher.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36E5E36323495994D1158528 /* Pods_flvpusher.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		814569AA1E5A8D020006D35F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 814569A61E5A8D020006D35F /* libevent.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4780F2DB1C7C711500A2A156;
+			remoteInfo = libevent;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		1838B0211EFBC0D500B3D53E /* amf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = amf.h; sourceTree = "<group>"; };
+		1838B0221EFBC0D500B3D53E /* bytes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bytes.h; sourceTree = "<group>"; };
+		1838B0231EFBC0D500B3D53E /* dh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dh.h; sourceTree = "<group>"; };
+		1838B0241EFBC0D500B3D53E /* dhgroups.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dhgroups.h; sourceTree = "<group>"; };
+		1838B0251EFBC0D500B3D53E /* error.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = error.h; sourceTree = "<group>"; };
+		1838B0261EFBC0D600B3D53E /* handshake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = handshake.h; sourceTree = "<group>"; };
+		1838B0271EFBC0D600B3D53E /* http.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http.h; sourceTree = "<group>"; };
+		1838B0281EFBC0D600B3D53E /* libWSLibrtmpUnion.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libWSLibrtmpUnion.a; sourceTree = "<group>"; };
+		1838B0291EFBC0D600B3D53E /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
+		1838B02A1EFBC0D600B3D53E /* pt_module.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pt_module.h; sourceTree = "<group>"; };
+		1838B02B1EFBC0D600B3D53E /* PushModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PushModule.h; sourceTree = "<group>"; };
+		1838B02C1EFBC0D600B3D53E /* rtmp_sys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rtmp_sys.h; sourceTree = "<group>"; };
+		1838B02D1EFBC0D600B3D53E /* rtmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rtmp.h; sourceTree = "<group>"; };
+		1838B02E1EFBC0D600B3D53E /* WSLibrtmpUnion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WSLibrtmpUnion.h; sourceTree = "<group>"; };
+		1838B02F1EFBC0D600B3D53E /* WsPushModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WsPushModule.h; sourceTree = "<group>"; };
+		36E5E36323495994D1158528 /* Pods_flvpusher.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_flvpusher.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		37AF9538BC94E7E63A74EE88 /* Pods-flvpusher.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-flvpusher.release.xcconfig"; path = "Pods/Target Support Files/Pods-flvpusher/Pods-flvpusher.release.xcconfig"; sourceTree = "<group>"; };
+		810D7FBA1E529D1200393AF9 /* ws_cut.flv */ = {isa = PBXFileReference; lastKnownFileType = file; path = ws_cut.flv; sourceTree = "<group>"; };
+		810D7FBB1E529D1200393AF9 /* ws_cut2.flv */ = {isa = PBXFileReference; lastKnownFileType = file; path = ws_cut2.flv; sourceTree = "<group>"; };
+		810D7FC41E5306AA00393AF9 /* flv_pusher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = flv_pusher.cpp; sourceTree = "<group>"; };
+		810D7FC51E5306AA00393AF9 /* flv_pusher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flv_pusher.h; sourceTree = "<group>"; };
+		810D7FC61E5306AA00393AF9 /* FlvParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FlvParser.cpp; sourceTree = "<group>"; };
+		810D7FC71E5306AA00393AF9 /* FlvParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlvParser.h; sourceTree = "<group>"; };
+		810D7FE71E53086A00393AF9 /* flvpusher-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "flvpusher-Bridging-Header.h"; sourceTree = "<group>"; };
+		810D7FEC1E5402AD00393AF9 /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = "Pods/../build/Debug-iphoneos/Alamofire/Alamofire.framework"; sourceTree = "<group>"; };
+		814569A61E5A8D020006D35F /* libevent.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libevent.xcodeproj; path = libevent/libevent.xcodeproj; sourceTree = SOURCE_ROOT; };
+		819249EB1E4EF892003B1FE9 /* flvpusher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = flvpusher.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		819249EE1E4EF892003B1FE9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		819249F01E4EF892003B1FE9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		819249F31E4EF892003B1FE9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		819249F51E4EF892003B1FE9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		819249F81E4EF892003B1FE9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		819249FA1E4EF892003B1FE9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FC280398B3DCABF189F47A06 /* Pods-flvpusher.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-flvpusher.debug.xcconfig"; path = "Pods/Target Support Files/Pods-flvpusher/Pods-flvpusher.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		819249E81E4EF891003B1FE9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				814569AC1E5A8D0B0006D35F /* liblibevent.a in Frameworks */,
+				B706C5F5434C6C0ADB7E5BD4 /* Pods_flvpusher.framework in Frameworks */,
+				1838B0301EFBC0D600B3D53E /* libWSLibrtmpUnion.a in Frameworks */,
+				810D7FED1E5402AD00393AF9 /* Alamofire.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7FB50163BEBABEE77A86259D /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				FC280398B3DCABF189F47A06 /* Pods-flvpusher.debug.xcconfig */,
+				37AF9538BC94E7E63A74EE88 /* Pods-flvpusher.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		810D7FB91E529D1200393AF9 /* Flv */ = {
+			isa = PBXGroup;
+			children = (
+				810D7FBA1E529D1200393AF9 /* ws_cut.flv */,
+				810D7FBB1E529D1200393AF9 /* ws_cut2.flv */,
+			);
+			path = Flv;
+			sourceTree = "<group>";
+		};
+		810D7FBE1E5306AA00393AF9 /* Rtmp */ = {
+			isa = PBXGroup;
+			children = (
+				1838B0211EFBC0D500B3D53E /* amf.h */,
+				1838B0221EFBC0D500B3D53E /* bytes.h */,
+				1838B0231EFBC0D500B3D53E /* dh.h */,
+				1838B0241EFBC0D500B3D53E /* dhgroups.h */,
+				1838B0251EFBC0D500B3D53E /* error.h */,
+				1838B0261EFBC0D600B3D53E /* handshake.h */,
+				1838B0271EFBC0D600B3D53E /* http.h */,
+				1838B0281EFBC0D600B3D53E /* libWSLibrtmpUnion.a */,
+				1838B0291EFBC0D600B3D53E /* log.h */,
+				1838B02A1EFBC0D600B3D53E /* pt_module.h */,
+				1838B02B1EFBC0D600B3D53E /* PushModule.h */,
+				1838B02C1EFBC0D600B3D53E /* rtmp_sys.h */,
+				1838B02D1EFBC0D600B3D53E /* rtmp.h */,
+				1838B02E1EFBC0D600B3D53E /* WSLibrtmpUnion.h */,
+				1838B02F1EFBC0D600B3D53E /* WsPushModule.h */,
+				814569A61E5A8D020006D35F /* libevent.xcodeproj */,
+				810D7FC41E5306AA00393AF9 /* flv_pusher.cpp */,
+				810D7FC51E5306AA00393AF9 /* flv_pusher.h */,
+				810D7FC61E5306AA00393AF9 /* FlvParser.cpp */,
+				810D7FC71E5306AA00393AF9 /* FlvParser.h */,
+				810D7FE71E53086A00393AF9 /* flvpusher-Bridging-Header.h */,
+			);
+			path = Rtmp;
+			sourceTree = "<group>";
+		};
+		814569A71E5A8D020006D35F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				814569AB1E5A8D020006D35F /* liblibevent.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		819249E21E4EF891003B1FE9 = {
+			isa = PBXGroup;
+			children = (
+				819249ED1E4EF892003B1FE9 /* flvpusher */,
+				819249EC1E4EF892003B1FE9 /* Products */,
+				7FB50163BEBABEE77A86259D /* Pods */,
+				B3DE2AF3AB72F349B16F906C /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		819249EC1E4EF892003B1FE9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				819249EB1E4EF892003B1FE9 /* flvpusher.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		819249ED1E4EF892003B1FE9 /* flvpusher */ = {
+			isa = PBXGroup;
+			children = (
+				810D7FBE1E5306AA00393AF9 /* Rtmp */,
+				810D7FB91E529D1200393AF9 /* Flv */,
+				819249EE1E4EF892003B1FE9 /* AppDelegate.swift */,
+				819249F01E4EF892003B1FE9 /* ViewController.swift */,
+				819249F21E4EF892003B1FE9 /* Main.storyboard */,
+				819249F51E4EF892003B1FE9 /* Assets.xcassets */,
+				819249F71E4EF892003B1FE9 /* LaunchScreen.storyboard */,
+				819249FA1E4EF892003B1FE9 /* Info.plist */,
+			);
+			path = flvpusher;
+			sourceTree = "<group>";
+		};
+		B3DE2AF3AB72F349B16F906C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				810D7FEC1E5402AD00393AF9 /* Alamofire.framework */,
+				36E5E36323495994D1158528 /* Pods_flvpusher.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		819249EA1E4EF891003B1FE9 /* flvpusher */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 819249FD1E4EF892003B1FE9 /* Build configuration list for PBXNativeTarget "flvpusher" */;
+			buildPhases = (
+				CD608EC07C4954198922CAD8 /* [CP] Check Pods Manifest.lock */,
+				819249E71E4EF891003B1FE9 /* Sources */,
+				819249E81E4EF891003B1FE9 /* Frameworks */,
+				819249E91E4EF891003B1FE9 /* Resources */,
+				2135C21590663B693C19469B /* [CP] Embed Pods Frameworks */,
+				AD91ED262644CCBB551D5CF5 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = flvpusher;
+			productName = flvpusher;
+			productReference = 819249EB1E4EF892003B1FE9 /* flvpusher.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		819249E31E4EF891003B1FE9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0810;
+				LastUpgradeCheck = 0810;
+				ORGANIZATIONNAME = zous;
+				TargetAttributes = {
+					819249EA1E4EF891003B1FE9 = {
+						CreatedOnToolsVersion = 8.1;
+						DevelopmentTeam = 5MCFDC4LE7;
+						LastSwiftMigration = 0810;
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = 819249E61E4EF891003B1FE9 /* Build configuration list for PBXProject "flvpusher" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 819249E21E4EF891003B1FE9;
+			productRefGroup = 819249EC1E4EF892003B1FE9 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 814569A71E5A8D020006D35F /* Products */;
+					ProjectRef = 814569A61E5A8D020006D35F /* libevent.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				819249EA1E4EF891003B1FE9 /* flvpusher */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		814569AB1E5A8D020006D35F /* liblibevent.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = liblibevent.a;
+			remoteRef = 814569AA1E5A8D020006D35F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		819249E91E4EF891003B1FE9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				819249F91E4EF892003B1FE9 /* LaunchScreen.storyboard in Resources */,
+				810D7FBC1E529D1200393AF9 /* ws_cut.flv in Resources */,
+				819249F61E4EF892003B1FE9 /* Assets.xcassets in Resources */,
+				810D7FBD1E529D1200393AF9 /* ws_cut2.flv in Resources */,
+				819249F41E4EF892003B1FE9 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2135C21590663B693C19469B /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-flvpusher/Pods-flvpusher-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		AD91ED262644CCBB551D5CF5 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-flvpusher/Pods-flvpusher-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CD608EC07C4954198922CAD8 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		819249E71E4EF891003B1FE9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				810D7FDD1E5306AA00393AF9 /* FlvParser.cpp in Sources */,
+				810D7FDC1E5306AA00393AF9 /* flv_pusher.cpp in Sources */,
+				819249F11E4EF892003B1FE9 /* ViewController.swift in Sources */,
+				819249EF1E4EF892003B1FE9 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		819249F21E4EF892003B1FE9 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				819249F31E4EF892003B1FE9 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		819249F71E4EF892003B1FE9 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				819249F81E4EF892003B1FE9 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		819249FB1E4EF892003B1FE9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		819249FC1E4EF892003B1FE9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		819249FE1E4EF892003B1FE9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FC280398B3DCABF189F47A06 /* Pods-flvpusher.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer: zhou zhifeng (58CX525NQ4)";
+				DEVELOPMENT_TEAM = 5MCFDC4LE7;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/build/Debug-iphoneos/Alamofire",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					NO_CRYPTO,
+					NO_SSL,
+				);
+				INFOPLIST_FILE = flvpusher/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/flvpusher/Rtmp",
+					"$(PROJECT_DIR)/wsLibrtmp",
+					"$(PROJECT_DIR)/flvpusher",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.flvpusher;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "b9f01e82-8d99-4bd3-ad02-4c3b476e5509";
+				PROVISIONING_PROFILE_SPECIFIER = dbg_com;
+				SWIFT_OBJC_BRIDGING_HEADER = "flvpusher/Rtmp/flvpusher-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "${SRCROOT}";
+			};
+			name = Debug;
+		};
+		819249FF1E4EF892003B1FE9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 37AF9538BC94E7E63A74EE88 /* Pods-flvpusher.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer: zhou zhifeng (58CX525NQ4)";
+				DEVELOPMENT_TEAM = 5MCFDC4LE7;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/build/Debug-iphoneos/Alamofire",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					NO_CRYPTO,
+					NO_SSL,
+				);
+				INFOPLIST_FILE = flvpusher/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/flvpusher/Rtmp",
+					"$(PROJECT_DIR)/wsLibrtmp",
+					"$(PROJECT_DIR)/flvpusher",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.flvpusher;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "b9f01e82-8d99-4bd3-ad02-4c3b476e5509";
+				PROVISIONING_PROFILE_SPECIFIER = dbg_com;
+				SWIFT_OBJC_BRIDGING_HEADER = "flvpusher/Rtmp/flvpusher-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "${SRCROOT}";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		819249E61E4EF891003B1FE9 /* Build configuration list for PBXProject "flvpusher" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				819249FB1E4EF892003B1FE9 /* Debug */,
+				819249FC1E4EF892003B1FE9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		819249FD1E4EF892003B1FE9 /* Build configuration list for PBXNativeTarget "flvpusher" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				819249FE1E4EF892003B1FE9 /* Debug */,
+				819249FF1E4EF892003B1FE9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 819249E31E4EF891003B1FE9 /* Project object */;
+}
