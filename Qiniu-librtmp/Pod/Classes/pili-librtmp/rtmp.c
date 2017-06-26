@@ -33,6 +33,8 @@
 #include "log.h"
 #include "rtmp_sys.h"
 #include "time.h"
+#include "rtmp.h"
+
 
 #ifdef CRYPTO
 #ifdef USE_POLARSSL
@@ -144,6 +146,57 @@ uint32_t
     return times(&t) * 1000 / clk_tck;
 #endif
 }
+
+
+
+
+int AMF_Dump_name(PILI_AMFObject *obj, PILI_AVal *p_name)
+{
+    int n, ret;
+    for (n = 0; n < obj->o_num; ++n)
+    {
+        ret = AMFProp_Dump_name(&obj->o_props[n], p_name);
+        if(ret == 0)
+        {
+            return ret;
+        }
+    }
+    return -1;
+}
+
+
+int
+AMFProp_Dump_name(PILI_AMFObjectProperty *prop, PILI_AVal *p_name)
+{
+    PILI_AVal name;
+    int ret;
+    if (prop->p_type != PILI_AMF_STRING && prop->p_type != PILI_AMF_OBJECT)
+    {
+        return -1;
+    }
+    if (prop->p_type == PILI_AMF_OBJECT)
+    {
+        ret = AMF_Dump_name(&prop->p_vu.p_object, p_name);
+        return ret;
+    }
+    
+    if (prop->p_name.av_len)
+    {
+        PILI_RTMP_Log(PILI_RTMP_LOGDEBUG, "prop_name:%s.", prop->p_name.av_val);
+        if(strncmp(prop->p_name.av_val, p_name->av_val, p_name->av_len) == 0)
+        {
+            snprintf(p_name->av_val, 255, "%.*s", prop->p_vu.p_aval.av_len,
+                     prop->p_vu.p_aval.av_val);
+            p_name->av_len = prop->p_vu.p_aval.av_len;
+            return 0;
+        }
+        return -1;
+    }
+    return -1;
+}
+
+
+
 
 void PILI_RTMP_UserInterrupt() {
     PILI_RTMP_ctrlC = TRUE;
@@ -1027,6 +1080,12 @@ int PILI_RTMP_Connect1(PILI_RTMP *r, PILI_RTMPPacket *cp, RTMPError *error) {
 int PILI_RTMP_Connect(PILI_RTMP *r, PILI_RTMPPacket *cp, RTMPError *error) {
     //获取hub
     char hub[5] = {0};
+    char negotiate[4096] = {0};
+    
+    expore_all_module(negotiate);
+    r->Link.negotiate.av_val = negotiate;
+    r->Link.negotiate.av_len = strlen(negotiate);
+    
     if (r->Link.app.av_len>4) {
         strncpy(hub, r->Link.app.av_val,4);
     }else if(r->Link.app.av_len>0){
@@ -1128,10 +1187,13 @@ static int
 
 int PILI_RTMP_ConnectStream(PILI_RTMP *r, int seekTime, RTMPError *error) {
     PILI_RTMPPacket packet = {0};
-
+    int ret;
     /* seekTime was already set by SetupStream / SetupURL.
    * This is only needed by ReconnectStream.
    */
+    if(r->push_module != NULL)
+        goto push_module;
+
     if (seekTime > 0)
         r->Link.seekTime = seekTime;
 
@@ -1150,10 +1212,77 @@ int PILI_RTMP_ConnectStream(PILI_RTMP *r, int seekTime, RTMPError *error) {
             }
 
             PILI_RTMP_ClientPacket(r, &packet);
+            if(r->push_module) {
+                ret = r->push_module->init(r, error);
+                return ret;
+            }
             PILI_RTMPPacket_Free(&packet);
         }
     }
 
+push_module:
+
+    if(r->push_module) {
+        
+        r->push_module->release(r);
+    }
+    ret = r->push_module->init(r, error);
+    if(ret == 0) {
+        return TRUE;
+    }
+    r->push_module->release(r);
+    error->code = PILI_RTMPErrorRTMPConnectStreamFailed;
+    return ret;
+}
+
+
+static int SendReleaseStream(PILI_RTMP *r, RTMPError *error);
+static int SendFCPublish(PILI_RTMP *r, RTMPError *error);
+
+int PILI_RTMP_ConnectStream_Module(PILI_RTMP *r, RTMPError *error) {
+    PILI_RTMPPacket packet = {0};
+    
+    if (r->Link.protocol & RTMP_FEATURE_WRITE)
+    {
+        SendReleaseStream(r, error);
+        SendFCPublish(r, error);
+    }
+    else
+    {
+        PILI_RTMP_SendServerBW(r, error);
+        PILI_RTMP_SendCtrl(r, 3, 0, 300, error);
+    }
+    PILI_RTMP_SendCreateStream(r, error);
+    
+    if (!(r->Link.protocol & RTMP_FEATURE_WRITE))
+    {
+        /* Send the FCSubscribe if live stream or if subscribepath is set */
+        if (r->Link.subscribepath.av_len)
+            PILI_SendFCSubscribe(r, &r->Link.subscribepath, error);
+        else if (r->Link.lFlags & RTMP_LF_LIVE)
+            PILI_SendFCSubscribe(r, &r->Link.playpath,error);
+    }
+    
+    while (!r->m_bPlaying && PILI_RTMP_IsConnected(r) && PILI_RTMP_ReadPacket(r, &packet))
+    {
+        if (RTMPPacket_IsReady(&packet))
+        {
+            if (!packet.m_nBodySize)
+                continue;
+            if ((packet.m_packetType == RTMP_PACKET_TYPE_AUDIO) ||
+                (packet.m_packetType == RTMP_PACKET_TYPE_VIDEO) ||
+                (packet.m_packetType == RTMP_PACKET_TYPE_INFO))
+            {
+                PILI_RTMP_Log(PILI_RTMP_LOGWARNING, "Received FLV packet before play()! Ignoring.");
+                PILI_RTMPPacket_Free(&packet);
+                continue;
+            }
+            
+            PILI_RTMP_ClientPacket(r, &packet);
+            PILI_RTMPPacket_Free(&packet);
+        }
+    }
+    
     if (!r->m_bPlaying && error) {
         char *msg = "PILI_RTMP connect stream failed.";
         PILI_RTMPError_Alloc(error, strlen(msg));
@@ -1164,7 +1293,9 @@ int PILI_RTMP_ConnectStream(PILI_RTMP *r, int seekTime, RTMPError *error) {
     return r->m_bPlaying;
 }
 
-int PILI_RTMP_ReconnectStream(PILI_RTMP *r, int seekTime, RTMPError *error) {
+
+
+int PILI_RTMP_ReconnecConn(PILI_RTMP *r, int seekTime, RTMPError *error) {
     PILI_RTMP_DeleteStream(r, error);
 
     PILI_RTMP_SendCreateStream(r, error);
@@ -1653,6 +1784,7 @@ SAVC(secureTokenResponse);
 SAVC(type);
 SAVC(nonprivate);
 SAVC(xreqid);
+SAVC(negotiate);
 
 static int
     PILI_SendConnectPacket(PILI_RTMP *r, PILI_RTMPPacket *cp, RTMPError *error) {
@@ -1706,6 +1838,11 @@ static int
     }
     if (r->Link.tcUrl.av_len) {
         enc = PILI_AMF_EncodeNamedString(enc, pend, &av_tcUrl, &r->Link.tcUrl);
+        if (!enc)
+            return FALSE;
+    }
+    if (r->Link.negotiate.av_len) {
+        enc = PILI_AMF_EncodeNamedString(enc, pend, &av_negotiate, &r->Link.negotiate);
         if (!enc)
             return FALSE;
     }
@@ -2477,6 +2614,11 @@ static int
     PILI_HandleInvoke(PILI_RTMP *r, const char *body, unsigned int nBodySize) {
     PILI_AMFObject obj;
     PILI_AVal method;
+    PILI_AVal negotiate;
+    char p_name[256] = "negotiate";
+    negotiate.av_val = p_name;
+    negotiate.av_len = strlen(p_name);
+
     int txn;
     int ret = 0, nRes;
     if (body[0] != 0x02) /* make sure it is a string method name we start with */
@@ -2526,6 +2668,19 @@ static int
                     PILI_DecodeTEA(&r->Link.token, &p.p_vu.p_aval);
                     SendSecureTokenResponse(r, &p.p_vu.p_aval, &error);
                 }
+            }
+            if (r->Link.negotiate.av_len) {
+                AMF_Dump_name(&obj, &negotiate);
+                if(negotiate.av_len != 0)
+                {
+                    
+                    r->push_module = select_module(&negotiate);
+                    
+                    free(methodInvoked.av_val);
+                    PILI_AMF_Reset(&obj);
+                    return 0;
+                }
+
             }
             if (r->Link.protocol & RTMP_FEATURE_WRITE) {
                 SendReleaseStream(r, &error);
@@ -3293,6 +3448,33 @@ int PILI_RTMP_SendChunk(PILI_RTMP *r, PILI_RTMPChunk *chunk, RTMPError *error) {
 }
 
 int PILI_RTMP_SendPacket(PILI_RTMP *r, PILI_RTMPPacket *packet, int queue, RTMPError *error) {
+    static i = 0;
+    int ret;
+    int tag_size = 1 + 3 + 3 + 1 + 3 + packet->m_nBodySize;
+
+    if(r->push_module == NULL || strncmp(r->push_module->module_name, "RTMPPushModule", strlen("RTMPPushModule")) == 0) {
+        ret = PILI_RTMP_SendPacket_Module(r, packet, queue, error);
+    } else {
+        char *flv_tag = malloc(tag_size);
+        if(flv_tag == NULL) {
+            PILI_RTMP_Log(PILI_RTMP_LOGERROR, "malloc error");
+            return FALSE;
+        }
+        memset(flv_tag, 0, tag_size);
+
+        PILI_RTMP_Log(PILI_RTMP_LOGERROR, "malloc1 %p, tag_size: %d", flv_tag, tag_size);
+        ret = rtmp_packet_to_flv(packet, flv_tag, tag_size);
+        r->push_module->push_message_push(r, flv_tag, tag_size, error);
+        free(flv_tag);
+        flv_tag = NULL;
+
+    }
+
+    return ret;
+    
+}
+        
+int PILI_RTMP_SendPacket_Module(PILI_RTMP *r, PILI_RTMPPacket *packet, int queue, RTMPError *error) {
     const PILI_RTMPPacket *prevPacket = r->m_vecChannelsOut[packet->m_nChannel];
     uint32_t last = 0;
     int nSize;
@@ -3302,17 +3484,17 @@ int PILI_RTMP_SendPacket(PILI_RTMP *r, PILI_RTMPPacket *packet, int queue, RTMPE
     char *buffer, *tbuf = NULL, *toff = NULL;
     int nChunkSize;
     int tlen;
-
+    
     if (prevPacket && packet->m_headerType != RTMP_PACKET_SIZE_LARGE) {
         /* compress a bit by using the prev packet's attributes */
         if (prevPacket->m_nBodySize == packet->m_nBodySize && prevPacket->m_packetType == packet->m_packetType && packet->m_headerType == RTMP_PACKET_SIZE_MEDIUM)
             packet->m_headerType = RTMP_PACKET_SIZE_SMALL;
-
+        
         if (prevPacket->m_nTimeStamp == packet->m_nTimeStamp && packet->m_headerType == RTMP_PACKET_SIZE_SMALL)
             packet->m_headerType = RTMP_PACKET_SIZE_MINIMUM;
         last = prevPacket->m_nTimeStamp;
     }
-
+    
     if (packet->m_headerType > 3) /* sanity */
     {
         if (error) {
@@ -3321,18 +3503,18 @@ int PILI_RTMP_SendPacket(PILI_RTMP *r, PILI_RTMPPacket *packet, int queue, RTMPE
             error->code = PILI_RTMPErrorSanityFailed;
             strcpy(error->message, msg);
         }
-
+        
         PILI_RTMP_Log(PILI_RTMP_LOGERROR, "sanity failed!! trying to send header of type: 0x%02x.",
-                 (unsigned char)packet->m_headerType);
-
+                      (unsigned char)packet->m_headerType);
+        
         return FALSE;
     }
-
+    
     nSize = packetSize[packet->m_headerType];
     hSize = nSize;
     cSize = 0;
     t = packet->m_nTimeStamp - last;
-
+    
     if (packet->m_body) {
         header = packet->m_body - nSize;
         hend = packet->m_body;
@@ -3340,7 +3522,7 @@ int PILI_RTMP_SendPacket(PILI_RTMP *r, PILI_RTMPPacket *packet, int queue, RTMPE
         header = hbuf + 6;
         hend = hbuf + sizeof(hbuf);
     }
-
+    
     if (packet->m_nChannel > 319)
         cSize = 2;
     else if (packet->m_nChannel > 63)
@@ -3349,12 +3531,12 @@ int PILI_RTMP_SendPacket(PILI_RTMP *r, PILI_RTMPPacket *packet, int queue, RTMPE
         header -= cSize;
         hSize += cSize;
     }
-
+    
     if (nSize > 1 && t >= 0xffffff) {
         header -= 4;
         hSize += 4;
     }
-
+    
     hptr = header;
     c = packet->m_headerType << 6;
     switch (cSize) {
@@ -3374,28 +3556,28 @@ int PILI_RTMP_SendPacket(PILI_RTMP *r, PILI_RTMPPacket *packet, int queue, RTMPE
         if (cSize == 2)
             *hptr++ = tmp >> 8;
     }
-
+    
     if (nSize > 1) {
         hptr = PILI_AMF_EncodeInt24(hptr, hend, t > 0xffffff ? 0xffffff : t);
     }
-
+    
     if (nSize > 4) {
         hptr = PILI_AMF_EncodeInt24(hptr, hend, packet->m_nBodySize);
         *hptr++ = packet->m_packetType;
     }
-
+    
     if (nSize > 8)
         hptr += EncodeInt32LE(hptr, packet->m_nInfoField2);
-
+    
     if (nSize > 1 && t >= 0xffffff)
         hptr = PILI_AMF_EncodeInt32(hptr, hend, t);
-
+    
     nSize = packet->m_nBodySize;
     buffer = packet->m_body;
     nChunkSize = r->m_outChunkSize;
-
+    
     PILI_RTMP_Log(PILI_RTMP_LOGDEBUG2, "%s: fd=%d, size=%d", __FUNCTION__, r->m_sb.sb_socket,
-             nSize);
+                  nSize);
     /* send all chunks in one HTTP request */
     if (r->Link.protocol & RTMP_FEATURE_HTTP) {
         int chunks = (nSize + nChunkSize - 1) / nChunkSize;
@@ -3409,10 +3591,10 @@ int PILI_RTMP_SendPacket(PILI_RTMP *r, PILI_RTMPPacket *packet, int queue, RTMPE
     }
     while (nSize + hSize) {
         int wrote;
-
+        
         if (nSize < nChunkSize)
             nChunkSize = nSize;
-
+        
         PILI_RTMP_LogHexString(PILI_RTMP_LOGDEBUG2, (uint8_t *)header, hSize);
         PILI_RTMP_LogHexString(PILI_RTMP_LOGDEBUG2, (uint8_t *)buffer, nChunkSize);
         if (tbuf) {
@@ -3426,7 +3608,7 @@ int PILI_RTMP_SendPacket(PILI_RTMP *r, PILI_RTMPPacket *packet, int queue, RTMPE
         nSize -= nChunkSize;
         buffer += nChunkSize;
         hSize = 0;
-
+        
         if (nSize > 0) {
             header = buffer - 1;
             hSize = 1;
@@ -3450,7 +3632,7 @@ int PILI_RTMP_SendPacket(PILI_RTMP *r, PILI_RTMPPacket *packet, int queue, RTMPE
         if (!wrote)
             return FALSE;
     }
-
+    
     /* we invoked a remote method */
     if (packet->m_packetType == 0x14) {
         PILI_AVal method;
@@ -3466,12 +3648,13 @@ int PILI_RTMP_SendPacket(PILI_RTMP *r, PILI_RTMPPacket *packet, int queue, RTMPE
             AV_queue(&r->m_methodCalls, &r->m_numCalls, &method, txn);
         }
     }
-
+    
     if (!r->m_vecChannelsOut[packet->m_nChannel])
         r->m_vecChannelsOut[packet->m_nChannel] = malloc(sizeof(PILI_RTMPPacket));
     memcpy(r->m_vecChannelsOut[packet->m_nChannel], packet, sizeof(PILI_RTMPPacket));
     return TRUE;
 }
+
 
 int PILI_RTMP_Serve(PILI_RTMP *r, RTMPError *error) {
     return SHandShake(r, error);
@@ -4281,6 +4464,14 @@ fail:
 static const PILI_AVal av_setDataFrame = AVC("@setDataFrame");
 
 int PILI_RTMP_Write(PILI_RTMP *r, const char *buf, int size, RTMPError *error) {
+    int ret = 0;
+    if(r->push_module->push_message_push != NULL) {
+        ret = r->push_module->push_message_push(r, (void*)buf, size, error);
+    }
+    return ret;
+}
+        
+int PILI_RTMP_Write_Module(PILI_RTMP *r, const char *buf, int size, RTMPError *error) {
     PILI_RTMPPacket *pkt = &r->m_write;
     char *pend, *enc;
     int s2 = size, ret, num;

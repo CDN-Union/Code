@@ -36,6 +36,7 @@
 #include <stdint.h>
 
 #include "amf.h"
+#include "PushModule.h"
 #include "error.h"
 
 #ifdef __cplusplus
@@ -130,6 +131,7 @@ typedef struct PILI_RTMP_LNK {
     PILI_AVal playpath0; /* parsed from URL */
     PILI_AVal playpath; /* passed in explicitly */
     PILI_AVal tcUrl;
+    PILI_AVal negotiate;
     PILI_AVal swfUrl;
     PILI_AVal pageUrl;
     PILI_AVal app;
@@ -217,7 +219,7 @@ typedef struct PILI_CONNECTION_TIME {
 
 typedef void (*PILI_RTMP_ConnectionTimeCallback)(
     PILI_CONNECTION_TIME *conn_time, void *userData);
-
+struct panda_push_module_s;
 typedef struct PILI_RTMP {
     int m_inChunkSize;
     int m_outChunkSize;
@@ -255,6 +257,7 @@ typedef struct PILI_RTMP {
     int m_polling;
     int m_resplen;
     int m_unackd;
+    struct panda_push_module_s *push_module;
     PILI_AVal m_clientID;
 
     PILI_RTMP_READ m_read;
@@ -301,6 +304,10 @@ int PILI_RTMP_Serve(PILI_RTMP *r, RTMPError *error);
 int PILI_RTMP_ReadPacket(PILI_RTMP *r, PILI_RTMPPacket *packet);
 int PILI_RTMP_SendPacket(PILI_RTMP *r, PILI_RTMPPacket *packet, int queue,
                          RTMPError *error);
+int PILI_RTMP_SendPacket_Module(PILI_RTMP *r, PILI_RTMPPacket *packet,
+    int queue,
+                        RTMPError *error);
+
 int PILI_RTMP_SendChunk(PILI_RTMP *r, PILI_RTMPChunk *chunk, RTMPError *error);
 int PILI_RTMP_IsConnected(PILI_RTMP *r);
 int PILI_RTMP_Socket(PILI_RTMP *r);
@@ -309,6 +316,8 @@ double PILI_RTMP_GetDuration(PILI_RTMP *r);
 int PILI_RTMP_ToggleStream(PILI_RTMP *r, RTMPError *error);
 
 int PILI_RTMP_ConnectStream(PILI_RTMP *r, int seekTime, RTMPError *error);
+int PILI_RTMP_ConnectStream_Module(PILI_RTMP *r, RTMPError *error);
+
 int PILI_RTMP_ReconnectStream(PILI_RTMP *r, int seekTime, RTMPError *error);
 void PILI_RTMP_DeleteStream(PILI_RTMP *r, RTMPError *error);
 int PILI_RTMP_GetNextMediaPacket(PILI_RTMP *r, PILI_RTMPPacket *packet);
@@ -346,6 +355,9 @@ int PILI_RTMP_SendClientBW(PILI_RTMP *r, RTMPError *error);
 void PILI_RTMP_DropRequest(PILI_RTMP *r, int i, int freeit);
 int PILI_RTMP_Read(PILI_RTMP *r, char *buf, int size);
 int PILI_RTMP_Write(PILI_RTMP *r, const char *buf, int size, RTMPError *error);
+int PILI_RTMP_Write_Module(PILI_RTMP *r, const char *buf, int size,
+    RTMPError *error);
+
 
 #define MAJOR 1
 #define MINOR 0
