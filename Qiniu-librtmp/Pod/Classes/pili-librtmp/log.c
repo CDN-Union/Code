@@ -32,7 +32,7 @@
 
 #define MAX_PRINT_LEN 2048
 
-PILI_RTMP_LogLevel PILI_RTMP_debuglevel = PILI_RTMP_LOGERROR;
+PILI_RTMP_LogLevel PILI_RTMP_debuglevel = PILI_RTMP_LOGALL;
 
 static int neednl;
 
