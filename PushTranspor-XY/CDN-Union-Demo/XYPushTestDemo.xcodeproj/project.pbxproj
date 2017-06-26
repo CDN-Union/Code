@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		52FA088A1F00B31E00A4AF5E /* amf.c in Sources */ = {isa = PBXBuildFile; fileRef = 52FA08811F00B31E00A4AF5E /* amf.c */; };
+		52FA088B1F00B31E00A4AF5E /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = 52FA08831F00B31E00A4AF5E /* error.c */; };
+		52FA088C1F00B31E00A4AF5E /* hashswf.c in Sources */ = {isa = PBXBuildFile; fileRef = 52FA08841F00B31E00A4AF5E /* hashswf.c */; };
+		52FA088D1F00B31E00A4AF5E /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = 52FA08851F00B31E00A4AF5E /* log.c */; };
+		52FA088F1F00B31E00A4AF5E /* parseurl.c in Sources */ = {isa = PBXBuildFile; fileRef = 52FA08871F00B31E00A4AF5E /* parseurl.c */; };
+		52FA08901F00B31E00A4AF5E /* PushModule.c in Sources */ = {isa = PBXBuildFile; fileRef = 52FA08881F00B31E00A4AF5E /* PushModule.c */; };
+		52FA08911F00B31E00A4AF5E /* rtmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 52FA08891F00B31E00A4AF5E /* rtmp.c */; };
+		52FA08931F00B41000A4AF5E /* libxy_living_push_lib_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 52FA08921F00B41000A4AF5E /* libxy_living_push_lib_ios.a */; };
 		6386A12B1DEFC9AA00FA8E5D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6386A12A1DEFC9AA00FA8E5D /* main.m */; };
 		6386A12E1DEFC9AA00FA8E5D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6386A12D1DEFC9AA00FA8E5D /* AppDelegate.m */; };
 		6386A1311DEFC9AB00FA8E5D /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6386A1301DEFC9AB00FA8E5D /* ViewController.mm */; };
@@ -15,10 +23,18 @@
 		6386A1391DEFC9AB00FA8E5D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6386A1371DEFC9AB00FA8E5D /* LaunchScreen.storyboard */; };
 		6386A14A1DEFCC3000FA8E5D /* flv in Resources */ = {isa = PBXBuildFile; fileRef = 6386A1491DEFCC3000FA8E5D /* flv */; };
 		6386A14D1DEFCDDC00FA8E5D /* libstdc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 6386A14C1DEFCDDC00FA8E5D /* libstdc++.tbd */; };
-		63BCD9FB1ECC7CB100B23369 /* libCDN_Union_ioslib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 63BCD9F61ECC7CB100B23369 /* libCDN_Union_ioslib.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		52FA08811F00B31E00A4AF5E /* amf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = amf.c; sourceTree = "<group>"; };
+		52FA08821F00B31E00A4AF5E /* dhgroups.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dhgroups.h; sourceTree = "<group>"; };
+		52FA08831F00B31E00A4AF5E /* error.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = error.c; sourceTree = "<group>"; };
+		52FA08841F00B31E00A4AF5E /* hashswf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hashswf.c; sourceTree = "<group>"; };
+		52FA08851F00B31E00A4AF5E /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = log.c; sourceTree = "<group>"; };
+		52FA08871F00B31E00A4AF5E /* parseurl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = parseurl.c; sourceTree = "<group>"; };
+		52FA08881F00B31E00A4AF5E /* PushModule.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = PushModule.c; sourceTree = "<group>"; };
+		52FA08891F00B31E00A4AF5E /* rtmp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rtmp.c; sourceTree = "<group>"; };
+		52FA08921F00B41000A4AF5E /* libxy_living_push_lib_ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libxy_living_push_lib_ios.a; sourceTree = "<group>"; };
 		6386A1261DEFC9AA00FA8E5D /* XYPushTestDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XYPushTestDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6386A12A1DEFC9AA00FA8E5D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6386A12C1DEFC9AA00FA8E5D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -37,7 +53,6 @@
 		63BCD9F31ECC7CB100B23369 /* error.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = error.h; sourceTree = "<group>"; };
 		63BCD9F41ECC7CB100B23369 /* handshake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = handshake.h; sourceTree = "<group>"; };
 		63BCD9F51ECC7CB100B23369 /* http.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http.h; sourceTree = "<group>"; };
-		63BCD9F61ECC7CB100B23369 /* libCDN_Union_ioslib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libCDN_Union_ioslib.a; sourceTree = "<group>"; };
 		63BCD9F71ECC7CB100B23369 /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
 		63BCD9F81ECC7CB100B23369 /* PushModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PushModule.h; sourceTree = "<group>"; };
 		63BCD9F91ECC7CB100B23369 /* rtmp_sys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rtmp_sys.h; sourceTree = "<group>"; };
@@ -50,7 +65,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6386A14D1DEFCDDC00FA8E5D /* libstdc++.tbd in Frameworks */,
-				63BCD9FB1ECC7CB100B23369 /* libCDN_Union_ioslib.a in Frameworks */,
+				52FA08931F00B41000A4AF5E /* libxy_living_push_lib_ios.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,13 +126,21 @@
 		63E8984B1E1FA7B200A668B1 /* sdk */ = {
 			isa = PBXGroup;
 			children = (
+				52FA08921F00B41000A4AF5E /* libxy_living_push_lib_ios.a */,
+				52FA08811F00B31E00A4AF5E /* amf.c */,
+				52FA08821F00B31E00A4AF5E /* dhgroups.h */,
+				52FA08831F00B31E00A4AF5E /* error.c */,
+				52FA08841F00B31E00A4AF5E /* hashswf.c */,
+				52FA08851F00B31E00A4AF5E /* log.c */,
+				52FA08871F00B31E00A4AF5E /* parseurl.c */,
+				52FA08881F00B31E00A4AF5E /* PushModule.c */,
+				52FA08891F00B31E00A4AF5E /* rtmp.c */,
 				63BCD9F01ECC7CB100B23369 /* amf.h */,
 				63BCD9F11ECC7CB100B23369 /* bytes.h */,
 				63BCD9F21ECC7CB100B23369 /* dh.h */,
 				63BCD9F31ECC7CB100B23369 /* error.h */,
 				63BCD9F41ECC7CB100B23369 /* handshake.h */,
 				63BCD9F51ECC7CB100B23369 /* http.h */,
-				63BCD9F61ECC7CB100B23369 /* libCDN_Union_ioslib.a */,
 				63BCD9F71ECC7CB100B23369 /* log.h */,
 				63BCD9F81ECC7CB100B23369 /* PushModule.h */,
 				63BCD9F91ECC7CB100B23369 /* rtmp_sys.h */,
@@ -199,8 +222,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				6386A1311DEFC9AB00FA8E5D /* ViewController.mm in Sources */,
+				52FA08901F00B31E00A4AF5E /* PushModule.c in Sources */,
 				6386A12E1DEFC9AA00FA8E5D /* AppDelegate.m in Sources */,
+				52FA088C1F00B31E00A4AF5E /* hashswf.c in Sources */,
+				52FA088A1F00B31E00A4AF5E /* amf.c in Sources */,
+				52FA088D1F00B31E00A4AF5E /* log.c in Sources */,
 				6386A12B1DEFC9AA00FA8E5D /* main.m in Sources */,
+				52FA088F1F00B31E00A4AF5E /* parseurl.c in Sources */,
+				52FA088B1F00B31E00A4AF5E /* error.c in Sources */,
+				52FA08911F00B31E00A4AF5E /* rtmp.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
